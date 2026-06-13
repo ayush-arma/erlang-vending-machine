@@ -10,12 +10,12 @@
 -export([
     init/1,
     callback_mode/0,
-    idle/3,
-    collecting_money/3,
-    dispensing/3
+    idle/3
 ]).
 
 
+callback_mode()->
+    state_functions.
 
 start_link()->
     gen_statem:start_link({local, ?MODULE}, ?MODULE, [], []).
@@ -23,9 +23,15 @@ start_link()->
 select(Item)->
     Item.
 
-insert_coin(Coin)->
-    Coin.
 
-init(_Anything) ->
-    io:format("Vending Machine started: RED~n"),
-    {ok, idle, #{}, [{state_timeout, 300, next}]}.
+init([]) ->
+    {ok, idle, #{}}.
+
+insert_coin({Pid,Coin})->
+    gen_statem:call(Pid, {coin_inserted,Coin}).
+
+idle({call, _From}, {coin_inserted,_CoinValue}, Data) ->
+    io:format("Variables Received~p"+Data),
+    Data.
+
+

@@ -1,7 +1,7 @@
 -module(inventory_server).
 -behaviour(gen_server). 
 
--export([start_link/0,get_price/1,check_stock/1,decrease_stock/1]).
+-export([start_link/0,get_price/1,check_stock/1,decrease_stock/1,get_items_below/1]).
 
 -export([
     init/1,
@@ -30,6 +30,9 @@ get_price(Item)->
 check_stock(Item)->
     gen_server:call(?MODULE,{check_stock,Item}).
 
+get_items_below(PriceLim)->
+    gen_server:call(?MODULE,{get_items_below,PriceLim}).
+
 decrease_stock(Item)->
     gen_server:cast(?MODULE,{decrease_stock,Item}).
 
@@ -38,7 +41,14 @@ handle_call({get_price,Item},_From,Map)->
     {reply,Price,Map};
 handle_call({check_stock,Item},_From,Map)->
     {_Price,Quantity} = maps:get(Item, Map, {0,0}),
-    {reply,Quantity,Map}.
+    {reply,Quantity,Map};
+handle_call({get_items_below, PriceLim}, _From, Map) ->
+    FilteredMap = maps:filter(
+        fun(_Key, {Price, _Quantity}) -> Price =< PriceLim end, 
+        Map
+    ),
+    {reply, FilteredMap, Map}.
+
 
 handle_cast({decrease_stock,Item},Map)->
     {Price,Quantity}=maps:get(Item,Map,{undefined,0}),
