@@ -1,9 +1,9 @@
 %% Compile the modules
 c(inventory_server).
-c(vending_machine).
 
 %% Start the processes
 inventory_server:start_link().
+c(vending_machine).
 vending_machine:start_link().
 
 %% Print a nice message to show it worked
