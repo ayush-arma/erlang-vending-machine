@@ -1,0 +1,10 @@
+%% Compile the modules
+c(inventory_server).
+c(vending_machine).
+
+%% Start the processes
+inventory_server:start_link().
+vending_machine:start_link().
+
+%% Print a nice message to show it worked
+io:format("~n🚀 Vending Machine & Inventory Server Started Successfully!~n~n").
