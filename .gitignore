@@ -1,1 +1,14 @@
+# Compiled files
 *.beam
+
+# Crash dumps
+erl_crash.dump
+
+# Rebar3 build directories
+_build/
+
+# ebin output
+ebin/
+
+# Dependencies
+deps/
