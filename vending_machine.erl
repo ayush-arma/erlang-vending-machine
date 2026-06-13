@@ -20,7 +20,6 @@ start_link()->
     gen_statem:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 select(Item)->
-    % reduce the count of that particular item and return the change
     gen_statem:call(?MODULE,{select,Item}).
 
 
@@ -31,8 +30,7 @@ insert_coin(Coin)->
     gen_statem:call(?MODULE, {show_items,Coin}).
 
 idle({call, From}, {show_items,CoinValue}, Data) ->
-    Items =
-        inventory_server:get_items_below(CoinValue),
+    Items = inventory_server:get_items_below(CoinValue),
     {keep_state, Data,[{reply,From, Items}]}.
 
 
