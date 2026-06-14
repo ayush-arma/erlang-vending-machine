@@ -18,6 +18,7 @@ callback_mode() ->
     state_functions.
 
 start_link() ->
+    io:format("vending_machine start_link() called~n"),
     gen_statem:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 select(Item) ->
@@ -30,7 +31,7 @@ insert_coin(Coin) ->
     gen_statem:call(?MODULE, {show_items, Coin}).
 
 idle({call, From}, {show_items, CoinValue}, Data) ->
-    io:format("Idle Called ~p ~p ~p",[From,CoinValue,Data]),
+    io:format("Idle Called ~p ~p ~p ~n" ,[From,CoinValue,Data]),
     Items = inventory_server:get_items_below(CoinValue),
     NewState = #{
         inserted => CoinValue,

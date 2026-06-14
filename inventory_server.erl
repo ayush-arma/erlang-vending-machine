@@ -18,6 +18,7 @@
 }).
 
 start_link() ->
+    io:format("inventory_server start_link() called~n"),
     gen_server:start_link({local, ?MODULE}, ?MODULE, ?INITIAL_VENDING_STATE, []).
 
 init(State) ->

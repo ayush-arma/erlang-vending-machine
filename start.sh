@@ -1,2 +1,7 @@
 #!/bin/bash
-erl -eval "file:eval(\".erlang\")."
+
+rm -f *.beam
+
+erlc *.erl
+
+erl -eval "inventory_server:start_link(), vending_machine:start_link()."

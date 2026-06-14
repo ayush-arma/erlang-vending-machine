@@ -1,10 +1,5 @@
-%% Compile the modules
-c(inventory_server).
-inventory_server:start_link().
+compile:file(inventory_server),
+inventory_server:start_link(),
 
-%% Start the processes
-c(vending_machine).
+compile:file(vending_machine),
 vending_machine:start_link().
-
-%% Print a nice message to show it worked
-% io:format("~n🚀 Vending Machine & Inventory Server Started Successfully!~n~n").
