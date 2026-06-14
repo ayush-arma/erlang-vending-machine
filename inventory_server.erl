@@ -8,6 +8,7 @@
     handle_call/3,
     handle_cast/2,
     terminate/2,
+    purchase/2,
     code_change/3
 ]).
 
@@ -36,6 +37,9 @@ get_items_below(PriceLim) ->
 decrease_stock(Item) ->
     gen_server:cast(?MODULE, {decrease_stock, Item}).
 
+purchase(Item, Cash) ->
+    gen_server:cast(?MODULE, {purchase, Item, Cash}).
+
 handle_call({get_price, Item}, _From, Map) ->
     {Price, _Quantity} = maps:get(Item, Map, {0, 0}),
     {reply, Price, Map};
@@ -45,9 +49,18 @@ handle_call({check_stock, Item}, _From, Map) ->
 handle_call({get_items_below, PriceLim}, _From, Map) ->
     FilteredMap = maps:filter(
         fun(_Key, {Price, _Quantity}) -> Price =< PriceLim end,
-        Map),
-    {reply, FilteredMap, Map}.
-
+        Map
+    ),
+    {reply, FilteredMap, Map};
+handle_call({purchase, Item, Cash}, _From, Map) ->
+    {Price, Quantity} = maps:get(Item, Map, {na, 0}),
+    case Quantity > 0 andalso Price =< Cash of
+        true ->
+            NewState = Map#{Item => {Price, Quantity - 1}},
+            {reply, {ok,Cash-Price}, NewState};
+        _ ->
+            {reply, {error, insufficient_funds}, Map}
+    end.
 handle_cast({decrease_stock, Item}, Map) ->
     {Price, Quantity} = maps:get(Item, Map, {undefined, 0}),
     case Quantity > 0 of
