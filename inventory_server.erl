@@ -45,8 +45,7 @@ handle_call({check_stock, Item}, _From, Map) ->
 handle_call({get_items_below, PriceLim}, _From, Map) ->
     FilteredMap = maps:filter(
         fun(_Key, {Price, _Quantity}) -> Price =< PriceLim end,
-        Map
-    ),
+        Map),
     {reply, FilteredMap, Map}.
 
 handle_cast({decrease_stock, Item}, Map) ->

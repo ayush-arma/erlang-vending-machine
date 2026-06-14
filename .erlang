@@ -1,5 +1,0 @@
-compile:file(inventory_server),
-inventory_server:start_link(),
-
-compile:file(vending_machine),
-vending_machine:start_link().
