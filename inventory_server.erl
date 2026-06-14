@@ -9,6 +9,8 @@
     handle_cast/2,
     terminate/2,
     purchase/2,
+    restock_item/2,
+    add_new_item/3,
     code_change/3
 ]).
 
@@ -40,6 +42,12 @@ decrease_stock(Item) ->
 purchase(Item, Cash) ->
     gen_server:call(?MODULE, {purchase, Item, Cash}).
 
+add_new_item(Item, Price, Quantity) ->
+    gen_server:cast(?MODULE, {add_new_item, Item, Price, Quantity}).
+
+restock_item(Item, Quantity) ->
+    gen_server:cast(?MODULE, {restock_item, Item, Quantity}).
+
 handle_call({get_price, Item}, _From, Map) ->
     {Price, _Quantity} = maps:get(Item, Map, {0, 0}),
     {reply, Price, Map};
@@ -57,7 +65,7 @@ handle_call({purchase, Item, Cash}, _From, Map) ->
     case Quantity > 0 andalso Price =< Cash of
         true ->
             NewState = Map#{Item => {Price, Quantity - 1}},
-            {reply, {ok,Cash-Price}, NewState};
+            {reply, {ok, Cash - Price}, NewState};
         _ ->
             {reply, {error, insufficient_funds}, Map}
     end.
@@ -68,6 +76,26 @@ handle_cast({decrease_stock, Item}, Map) ->
             {noreply, Map};
         _Anthing ->
             NewMap = Map#{Item => {Price, Quantity - 1}},
+            {noreply, NewMap}
+    end;
+handle_cast({add_new_item, Item, Price, Quantity}, Map) ->
+    {Found, _} = maps:get(Item, Map, {not_found, 0}),
+    case Found of
+        not_found ->
+            NewMap = Map#{Item => {Price, Quantity}},
+            {noreply, NewMap};
+        _ ->
+            {noreply, Map}
+    end;
+handle_cast({restock_item, Item, QuantityToAdd}, Map) ->
+    {Price, OldQuantity} = maps:get(Item, Map, {not_found, 0}),
+    case Price of
+        not_found ->
+            {noreply, Map};
+        _ ->
+            NewMap = Map#{
+                Item => {Price, OldQuantity + QuantityToAdd}
+            },
             {noreply, NewMap}
     end;
 handle_cast(_, Map) ->
