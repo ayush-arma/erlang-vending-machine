@@ -38,7 +38,7 @@ decrease_stock(Item) ->
     gen_server:cast(?MODULE, {decrease_stock, Item}).
 
 purchase(Item, Cash) ->
-    gen_server:cast(?MODULE, {purchase, Item, Cash}).
+    gen_server:call(?MODULE, {purchase, Item, Cash}).
 
 handle_call({get_price, Item}, _From, Map) ->
     {Price, _Quantity} = maps:get(Item, Map, {0, 0}),
